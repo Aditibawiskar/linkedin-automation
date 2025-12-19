@@ -1,0 +1,16 @@
+# Configuration
+.env
+cookies.json
+
+# Data Persistence
+history.json
+
+# Go Binaries
+/bin
+/dist
+*.exe
+*.exe~
+
+# OS Files
+.DS_Store
+Thumbs.db

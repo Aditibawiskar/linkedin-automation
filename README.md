@@ -1,117 +1,94 @@
-# LinkedIn Automation – Proof of Concept (SubSpace Assignment)
+# LinkedIn Automation – Internship Assignment (SubSpace)
 
 ## Overview
+This project is a technical proof-of-concept built for the SubSpace Software Development Internship (Sep-Dec Batch). 
 
-This project is a technical proof-of-concept built as part of the SubSpace Software Development Internship assignment.
+It implements a **Golang-based browser automation tool** that navigates LinkedIn, searches for specific job titles, and automates connection requests with personalized notes. It utilizes the **Rod** library with advanced stealth techniques to simulate human behavior.
 
-It demonstrates browser automation fundamentals, human-like interaction patterns, stealth techniques, and clean Go architecture using the Rod library.
-
-The goal of this assignment is NOT to automate LinkedIn for real-world usage, but to showcase:
-
-- Browser automation fundamentals
-- Anti-detection and stealth techniques
-- Modular and maintainable Go code
-- Understanding of real-world automation limitations
-
-⚠️ Educational purpose only. This project must not be used in production.
+⚠️ **Educational Purpose Only:** This tool is a proof-of-concept and strictly adheres to ethical automation standards.
 
 ---
 
-## Tech Stack
-
-- Language: Go
-- Browser Automation: Rod (Chrome DevTools Protocol)
-- Stealth Utilities: go-rod/stealth
-- Browser: Google Chrome (headful mode)
-- Operating System: Windows
-
----
-
-## Features Implemented
-
-- Automated Chrome launch using Rod
-- Human-like mouse movement with randomized paths
-- Randomized delays to simulate real user behavior
-- Natural scrolling behavior
-- Stealth browser configuration
-- Graceful error handling and logging
-- Modular folder structure following Go best practices
+## 🚀 Features Implemented
+* **Stealth Browser Automation:** Uses `go-rod/stealth` to mask automation signals (webdriver flags, user-agent).
+* **Human Simulation:** Implements Bézier curve mouse movements, randomized typing speeds, and variable delays.
+* **Smart Login Detection:** Supports a "Hybrid Login" workflow where the bot pauses for manual 2FA/CAPTCHA entry, then automatically resumes automation.
+* **Search & Targeting:** Automates searching for keywords (e.g., "Software Engineer") and parsing results.
+* **Connection & Messaging:** Automatically clicks "Connect," adds a personalized note, and sends the request.
+* **State Persistence:** Uses a local JSON database (`history.json`) to track invited users and prevent duplicate requests.
 
 ---
 
-## Project Structure
+## 🛠️ Tech Stack
+* **Language:** Go (Golang)
+* **Library:** Rod (DevTools Protocol)
+* **Stealth:** go-rod/stealth
+* **Storage:** JSON (local persistence)
 
+---
+
+## 📂 Project Structure
+```text
 linkedin-automation/
 ├── cmd/
-│   └── main.go
+│   └── main.go              # Entry point
 ├── internal/
-│   ├── auth/
-│   │   └── login.go
-│   ├── stealth/
-│   │   ├── mouse.go
-│   │   ├── scroll.go
-│   │   └── timing.go
-├── .env.example
-├── .gitignore
-├── go.mod
-├── go.sum
-└── README.md
+│   ├── connect/             # Logic for sending invites & notes
+│   ├── search/              # Logic for searching & filtering
+│   ├── stealth/             # Human-like mouse & behavior utilities
+│   └── storage/             # JSON-based state persistence
+├── .env.example             # Config template
+├── .gitignore               # Ignored files
+├── go.mod                   # Go module definition
+└── README.md                # Documentation
 
 ---
 
-## Authentication & Login Limitation
+⚙️ Setup & Usage
+Prerequisites
+• Go 1.20+ installed
+• Google Chrome installed
 
-OAuth-based authentication flows such as “Sign in with Google” intentionally block browser automation for security reasons.
+Installation
+1. Clone the repository:
 
-This project demonstrates automation up to the authentication boundary, focusing on:
+• git clone [https://github.com/Aditibawiskar/linkedin-automation.git](https://github.com/Aditibawiskar/  linkedin-automation.git)
+cd linkedin-automation
 
-- Browser control
-- Stealth techniques
-- Human-like interaction patterns
 
-Authenticated flows can be supported via session cookie reuse, which is documented conceptually but intentionally not enabled in this demo to respect platform security constraints.
+2. Install dependencies:
+```Bash
+• go mod tidy
 
----
+Running the Bot
+1. Run the application:
+```Bash
+• go run cmd/main.go
 
-## Environment Configuration
 
-This project uses environment variables for configuration.
+2. Manual Login Step:
 
-- .env – Local configuration file (not committed to version control)
-- .env.example – Template describing required environment variables
+• The browser will launch in full screen.
 
----
+• Action Required: Manually enter your email/password and solve any CAPTCHAs.
 
-## How to Run
+• Once you reach the LinkedIn "Home Feed," the bot will detect the login success and automatically take over.
 
-Prerequisites:
 
-- Go 1.20 or later
-- Google Chrome installed
-- Windows operating system
-
-Steps:
-
-1. Clone the repository
-2. Copy .env.example to .env
-3. Update values in .env if required
-4. Run the application:
-
-   go run cmd/main.go
-
-The browser will launch and navigate to the LinkedIn login page, demonstrating human-like interaction behavior.
+3. Watch: The bot will search, scroll, and send invites automatically.
 
 ---
 
-## Disclaimer
+🛡️ Anti-Detection Strategy
+To meet the assignment's stealth requirements, this tool implements:
 
-- This project does not attempt to bypass LinkedIn or Google security mechanisms.
-- It must not be used for real account automation.
-- Built strictly for educational and technical evaluation purposes.
+• Randomized Viewport: Mimics standard laptop screen resolutions.
+
+• Mouse Pathing: No straight-line movements; uses randomized curvature.
+
+• Variable Timing: Actions are spaced by random intervals (e.g., 2s–5s) to mimic human "think time."
 
 ---
 
-## Author
-
-Aditi Bawiskar  
-Software Development Internship Applicant – SubSpace
+Author
+Aditi Bawiskar Software Development Internship Applicant
