@@ -1,94 +1,52 @@
-# LinkedIn Automation – Internship Assignment (SubSpace)
+# LinkedIn Automation Bot (PoC)
 
-## Overview
-This project is a technical proof-of-concept built for the SubSpace Software Development Internship (Sep-Dec Batch). 
+A sophisticated Go-based automation tool utilizing `go-rod` to simulate human interactions on LinkedIn. This project demonstrates advanced browser automation, stealth techniques, and modular architecture.
 
-It implements a **Golang-based browser automation tool** that navigates LinkedIn, searches for specific job titles, and automates connection requests with personalized notes. It utilizes the **Rod** library with advanced stealth techniques to simulate human behavior.
+## ⚠️ Disclaimer
+**Educational Purpose Only.** This tool is a Proof-of-Concept designed for an internship assignment. Automating LinkedIn violates their Terms of Service.
 
-⚠️ **Educational Purpose Only:** This tool is a proof-of-concept and strictly adheres to ethical automation standards.
-
----
-
-## 🚀 Features Implemented
-* **Stealth Browser Automation:** Uses `go-rod/stealth` to mask automation signals (webdriver flags, user-agent).
-* **Human Simulation:** Implements Bézier curve mouse movements, randomized typing speeds, and variable delays.
-* **Smart Login Detection:** Supports a "Hybrid Login" workflow where the bot pauses for manual 2FA/CAPTCHA entry, then automatically resumes automation.
-* **Search & Targeting:** Automates searching for keywords (e.g., "Software Engineer") and parsing results.
-* **Connection & Messaging:** Automatically clicks "Connect," adds a personalized note, and sends the request.
-* **State Persistence:** Uses a local JSON database (`history.json`) to track invited users and prevent duplicate requests.
-
----
+## 🚀 Features
+* **Stealth Automation:** Uses `go-rod/stealth` and randomized delays to mask bot behavior.
+* **Smart Authentication:** Supports cookie persistence and pauses for manual 2FA/CAPTCHA handling.
+* **Targeted Outreach:** Searches by Job Title + Location and filters results.
+* **Safe Connection Logic:** Detects "Connect" vs "Message" buttons and handles "More" menus.
+* **Duplicate Detection:** Maintains a `history.json` database to prevent spamming users twice.
+* **Pagination:** Automatically traverses search result pages.
 
 ## 🛠️ Tech Stack
-* **Language:** Go (Golang)
-* **Library:** Rod (DevTools Protocol)
-* **Stealth:** go-rod/stealth
-* **Storage:** JSON (local persistence)
+* Go (Golang)
+* go-rod (Browser Automation)
+* godotenv (Config management)
 
----
+## 📦 Setup & Usage
+
+1.  **Clone the repository**
+    ```bash
+    git clone <your-repo-url>
+    cd linkedin-automation
+    ```
+
+2.  **Install Dependencies**
+    ```bash
+    go mod tidy
+    ```
+
+3.  **Configure Environment**
+    Rename `.env.example` to `.env` and add your credentials:
+    ```ini
+    LINKEDIN_EMAIL=myuser@gmail.com
+    LINKEDIN_PASSWORD=mypassword
+    ```
+
+4.  **Run the Bot**
+    ```bash
+    go run cmd/main.go
+    ```
 
 ## 📂 Project Structure
-```text
-linkedin-automation/
-├── cmd/
-│   └── main.go              # Entry point
-├── internal/
-│   ├── connect/             # Logic for sending invites & notes
-│   ├── search/              # Logic for searching & filtering
-│   ├── stealth/             # Human-like mouse & behavior utilities
-│   └── storage/             # JSON-based state persistence
-├── .env.example             # Config template
-├── .gitignore               # Ignored files
-├── go.mod                   # Go module definition
-└── README.md                # Documentation
-
----
-
-⚙️ Setup & Usage
-Prerequisites
-• Go 1.20+ installed
-• Google Chrome installed
-
-Installation
-1. Clone the repository:
-
-• git clone [https://github.com/Aditibawiskar/linkedin-automation.git](https://github.com/Aditibawiskar/  linkedin-automation.git)
-cd linkedin-automation
-
-
-2. Install dependencies:
-```Bash
-• go mod tidy
-
-Running the Bot
-1. Run the application:
-```Bash
-• go run cmd/main.go
-
-
-2. Manual Login Step:
-
-• The browser will launch in full screen.
-
-• Action Required: Manually enter your email/password and solve any CAPTCHAs.
-
-• Once you reach the LinkedIn "Home Feed," the bot will detect the login success and automatically take over.
-
-
-3. Watch: The bot will search, scroll, and send invites automatically.
-
----
-
-🛡️ Anti-Detection Strategy
-To meet the assignment's stealth requirements, this tool implements:
-
-• Randomized Viewport: Mimics standard laptop screen resolutions.
-
-• Mouse Pathing: No straight-line movements; uses randomized curvature.
-
-• Variable Timing: Actions are spaced by random intervals (e.g., 2s–5s) to mimic human "think time."
-
----
-
-Author
-Aditi Bawiskar Software Development Internship Applicant
+* `cmd/main.go`: Entry point and main orchestration logic.
+* `internal/auth`: Login and Cookie management.
+* `internal/browser`: Rod browser setup and Stealth injection.
+* `internal/search`: Profile parsing and pagination logic.
+* `internal/storage`: JSON-based state persistence (History).
+* `internal/human`: Human-like typing and sleep simulation.
