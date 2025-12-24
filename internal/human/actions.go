@@ -1,12 +1,11 @@
 package human
 
 import (
+	"github.com/go-rod/rod"
 	"math/rand"
 	"time"
-	"github.com/go-rod/rod"
 )
 
-// RandomSleep waits for a random time between min and max
 func RandomSleep(min, max time.Duration) {
 	if min >= max {
 		time.Sleep(min)
@@ -17,7 +16,6 @@ func RandomSleep(min, max time.Duration) {
 	time.Sleep(min + time.Duration(r))
 }
 
-// TypeSlowly types text into an element with random delays
 func TypeSlowly(el *rod.Element, text string) {
 	for _, char := range text {
 		el.MustInput(string(char))

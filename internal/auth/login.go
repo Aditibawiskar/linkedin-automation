@@ -2,94 +2,78 @@ package auth
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 	"github.com/go-rod/rod"
-	"linkedin-automation/internal/stealth" // Ensure this path matches your module name
+	"github.com/go-rod/rod/lib/input"
+	"linkedin-automation/internal/human"
 )
 
-// AttemptLogin tries to log in using cookies first, then credentials
 func AttemptLogin(browser *rod.Browser, page *rod.Page) {
-	// --- STEP 1: TRY LOADING COOKIES ---
-	fmt.Println("🤖 Bot: Checking for existing session cookies...")
-	err := LoadCookies(browser, "cookies.json")
-	if err == nil {
+
+	if err := LoadCookies(browser, "cookies.json"); err == nil {
 		fmt.Println("🤖 Bot: Cookies loaded. Verifying session...")
 		page.MustNavigate("https://www.linkedin.com/feed/")
-		page.MustWaitLoad()
-		stealth.SleepRandom(2000, 3000)
+		time.Sleep(5 * time.Second)
 
-		// Check if we are actually logged in
-		if isLoggedIn(page) {
-			fmt.Println("✅ Session Valid! Skipped Login.")
+		if page.MustInfo().URL == "https://www.linkedin.com/feed/" {
+			fmt.Println("✅ Session valid. Skipped Login.")
 			return
 		}
-		fmt.Println("⚠️  Cookies expired or invalid. Proceeding to manual login...")
 	}
 
-	// --- STEP 2: MANUAL LOGIN (If cookies failed) ---
+	// 2. Start Login Process
+	fmt.Println("🤖 Bot: Navigating to Login Page...")
+	page.MustNavigate("https://www.linkedin.com/login")
+	time.Sleep(3 * time.Second)
+
 	email := os.Getenv("LINKEDIN_EMAIL")
 	pass := os.Getenv("LINKEDIN_PASSWORD")
 
-	if email == "" || pass == "" {
-		log.Fatal("Error: LINKEDIN_EMAIL or LINKEDIN_PASSWORD not found in .env file")
-	}
-
-	fmt.Println("🤖 Bot: Navigating to Login Page...")
-	page.MustNavigate("https://www.linkedin.com/login")
-	page.MustWaitLoad()
-	stealth.SleepRandom(2000, 4000)
-
-	// Type Email
+	// 3. Human-like Typing
 	fmt.Println("🤖 Bot: Typing Email...")
-	emailField := page.MustElement("#username")
-	stealth.TypeLikeHuman(emailField, email)
-	stealth.SleepRandom(1000, 2000)
-
-	// Type Password
-	fmt.Println("🤖 Bot: Typing Password...")
-	passField := page.MustElement("#password")
-	stealth.TypeLikeHuman(passField, pass)
-	stealth.SleepRandom(1000, 3000)
-
-	// Click Sign In
-	fmt.Println("🤖 Bot: Clicking Sign In...")
-	page.MustElement("button[type='submit']").MustClick()
-
-	// --- STEP 3: SECURITY CHECKPOINT & WAIT ---
-	fmt.Println("🤖 Bot: Checking for security challenges...")
-
-	// Wait logic: Check specifically for feed or security challenge
-	waitForFeedOrChallenge(page)
-
-	// --- STEP 4: SAVE NEW COOKIES ---
-	fmt.Println("🤖 Bot: Login confirmed. Saving new cookies...")
-	if err := SaveCookies(browser, "cookies.json"); err != nil {
-		fmt.Printf("⚠️ Warning: Could not save cookies: %v\n", err)
-	} else {
-		fmt.Println("💾 Cookies saved to 'cookies.json' for next time.")
+	if exists, _, _ := page.Has("#username"); exists {
+		emailInput := page.MustElement("#username")
+		human.TypeSlowly(emailInput, email)
+		time.Sleep(1 * time.Second)
 	}
+
+	fmt.Println("🤖 Bot: Typing Password...")
+	if exists, _, _ := page.Has("#password"); exists {
+		passInput := page.MustElement("#password")
+		human.TypeSlowly(passInput, pass)
+		time.Sleep(1 * time.Second)
+	}
+
+	// 4. Click Sign In
+	fmt.Println("🤖 Bot: Clicking Sign In...")
+	page.KeyActions().Press(input.Enter).MustDo()
+	
+	// 🛑 THE SECURITY CHECK PAUSE 🛑
+	checkForSecurityCheck(page)
+
+	// 5. Save Cookies
+	fmt.Println("🤖 Bot: Login confirmed. Saving new cookies...")
+	SaveCookies(browser, "cookies.json")
 }
 
-func isLoggedIn(page *rod.Page) bool {
-
-	found, _, _ := page.Timeout(5 * time.Second).Has(".global-nav__content")
-	return found
-}
-
-// Helper to handle the "Wait for user to solve captcha" loop
-func waitForFeedOrChallenge(page *rod.Page) {
-	// Loop until we see the feed URL
-	for {
-		info, _ := page.Info()
-		if info.URL == "https://www.linkedin.com/feed/" || info.URL == "https://www.linkedin.com/" {
+// This function freezes the bot until it sees the "Feed" (Home page)
+func checkForSecurityCheck(page *rod.Page) {
+	fmt.Println("⏳ CHECKING FOR CAPTCHA/SECURITY CHECK...")
+	fmt.Println("👉 If you see a puzzle, please solve it manually now!")
+	
+	// Wait up to 120 seconds (2 minutes)
+	for i := 0; i < 24; i++ { 
+		url := page.MustInfo().URL
+		if url == "https://www.linkedin.com/feed/" || url == "https://www.linkedin.com/" {
 			fmt.Println("✅ Feed detected! Resuming automation...")
 			return
 		}
-
-		// If not on feed, warn user and wait
-		fmt.Println("⏳ Waiting for Home Feed... (If Captcha appeared, please solve it manually)")
-		time.Sleep(3 * time.Second)
+		
+		// Still waiting...
+		fmt.Printf("   ... Waiting for Feed (%d/120s)\n", (i+1)*5)
+		time.Sleep(5 * time.Second)
 	}
+	
+	fmt.Println("⚠️ Wait time over. Assuming login was successful or failed.")
 }

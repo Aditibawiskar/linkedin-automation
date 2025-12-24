@@ -11,10 +11,7 @@ func CheckAndMessage(page *rod.Page, profileURL string, followUpMsg string) {
     // If the button says "Message" instead of "Pending" or "Connect", they accepted.
     msgBtn, err := page.ElementR("button", "Message")
     if err == nil {
-        // They are a connection!
         msgBtn.MustClick()
-        
-        // Wait for chat box
         page.MustWaitStable()
         // Type and send
         editor := page.MustElement(".msg-form__contenteditable")

@@ -2,7 +2,7 @@ package browser
 
 import (
 	"github.com/go-rod/rod"
-	"github.com/go-rod/rod/lib/devices" // Added this import
+	"github.com/go-rod/rod/lib/devices" 
 	"github.com/go-rod/rod/lib/launcher"
 	"github.com/go-rod/stealth"
 )
@@ -12,7 +12,7 @@ func NewBrowser(headless bool) *rod.Browser {
 		Headless(headless).
 		Devtools(false).
 		Leakless(false).
-		Set("start-maximized", ""). // Force Window Maximize
+		Set("start-maximized", ""). 
 		Set("disable-blink-features", "AutomationControlled")
 
 	url := l.MustLaunch()

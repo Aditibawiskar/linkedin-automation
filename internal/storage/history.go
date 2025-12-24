@@ -9,7 +9,7 @@ import (
 
 type Entry struct {
 	ProfileURL string    `json:"profile_url"`
-	Action     string    `json:"action"` 
+	Action     string    `json:"action"`
 	Timestamp  time.Time `json:"timestamp"`
 }
 
@@ -24,12 +24,15 @@ func LoadHistory() {
 	defer mutex.Unlock()
 
 	data, err := os.ReadFile(historyFile)
-	if err == nil {
-		var entries []Entry
-		if json.Unmarshal(data, &entries) == nil {
-			for _, e := range entries {
-				History[e.ProfileURL] = e
-			}
+	if err != nil {
+		saveToDiskLocked()
+		return
+	}
+
+	var entries []Entry
+	if json.Unmarshal(data, &entries) == nil {
+		for _, e := range entries {
+			History[e.ProfileURL] = e
 		}
 	}
 }
@@ -46,13 +49,16 @@ func AddInvited(url string) {
 	defer mutex.Unlock()
 	entry := Entry{ProfileURL: url, Action: "invited", Timestamp: time.Now()}
 	History[url] = entry
-	saveToDisk()
+	saveToDiskLocked()
 }
 
-func saveToDisk() {
+func saveToDiskLocked() {
 	var entries []Entry
 	for _, e := range History {
 		entries = append(entries, e)
+	}
+	if entries == nil {
+		entries = []Entry{}
 	}
 	data, _ := json.MarshalIndent(entries, "", "  ")
 	os.WriteFile(historyFile, data, 0644)
